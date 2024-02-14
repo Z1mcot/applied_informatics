@@ -6,48 +6,54 @@ import (
 	"os"
 	"strings"
 
-	cv "gocv.io/x/gocv"
+	"gocv.io/x/gocv"
 )
 
-var extensions [2]string = [2]string{"png", "jpg"}
+var extensions = map[string]bool{
+	"jpg":  true,
+	"jpeg": true,
+	"png":  true,
+}
 
-func LoadAssetsForTemplateMathching() (cv.Mat, []cv.Mat) {
-	var template cv.Mat
-	var imgs []cv.Mat
+func LoadAssets() (templates []gocv.Mat, images []gocv.Mat) {
+	templateAssets, _ := GetAssets(Templates)
+	imgAssets, _ := GetAssets(Images)
 
-	assets, _ := GetAssets()
+	return loadImagesFromPaths(Templates, templateAssets), loadImagesFromPaths(Images, imgAssets)
+}
 
+func loadImagesFromPaths(baseDir Path, assets []os.DirEntry) []gocv.Mat {
+	images := make([]gocv.Mat, 0, len(assets))
 	for _, element := range assets {
 		splitName := strings.Split(element.Name(), ".")
-		if splitName[1] != "jpg" && splitName[1] != "jpeg" {
+		if !extensions[splitName[1]] {
 			continue
 		}
 
-		path := GetAssetsDir() + "/" + element.Name()
-		img := loadImage(path)
-		parsedImg, err := cv.ImageToMatRGBA(img)
+		path := string(baseDir) + "/" + element.Name()
+		parsedImg, err := gocv.ImageToMatRGBA(loadImage(path))
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if splitName[0] == "template" {
-			template = parsedImg
-		} else {
-			imgs = append(imgs, parsedImg)
-		}
+		images = append(images, parsedImg)
 	}
-
-	return template, imgs
+	return images
 }
 
-// Функция для загрузки изображения из файла
 func loadImage(filename string) image.Image {
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
+	file, openErr := os.Open(filename)
+	if openErr != nil {
+		log.Fatal(openErr)
+
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		fileErr := file.Close()
+		if fileErr != nil {
+			log.Fatal(fileErr)
+		}
+	}(file)
 
 	img, _, err := image.Decode(file)
 	if err != nil {

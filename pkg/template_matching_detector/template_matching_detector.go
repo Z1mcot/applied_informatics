@@ -1,11 +1,10 @@
 package templateMatchingDetector
 
 import (
+	cv "gocv.io/x/gocv"
 	"image"
 	"image/color"
 	_ "image/jpeg"
-
-	cv "gocv.io/x/gocv"
 )
 
 func Detect(filename string, template, img cv.Mat) {
@@ -18,5 +17,6 @@ func Detect(filename string, template, img cv.Mat) {
 	bottomRight := image.Point{X: topLeft.X + template.Cols(), Y: topLeft.Y + template.Rows()}
 	cv.Rectangle(&img, image.Rectangle{Min: topLeft, Max: bottomRight}, color.RGBA{A: 255, R: 255, G: 255, B: 255}, 1)
 
-	cv.IMWrite(filename+"_output.jpg", img)
+	filename = "template_matching" + filename + "_output.jpg"
+	cv.IMWrite(filename, img)
 }

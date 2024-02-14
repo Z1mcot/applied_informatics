@@ -4,13 +4,13 @@ import (
 	"strconv"
 
 	"github.com/z1mcot/applied_informatics/internal"
-	detector "github.com/z1mcot/applied_informatics/pkg/template_matching_detector"
+	templateDetector "github.com/z1mcot/applied_informatics/pkg/template_matching_detector"
 )
 
 func RunApp() {
-	template, imgs := internal.LoadAssetsForTemplateMathching()
+	templates, imgs := internal.LoadAssets()
 
 	for index, img := range imgs {
-		detector.Detect(strconv.Itoa(index), template, img)
+		templateDetector.Detect(strconv.Itoa(index), templates, img)
 	}
 }
