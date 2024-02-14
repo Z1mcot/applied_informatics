@@ -1,22 +1,24 @@
 package templateMatchingDetector
 
 import (
-	cv "gocv.io/x/gocv"
 	"image"
-	"image/color"
 	_ "image/jpeg"
+
+	"github.com/z1mcot/applied_informatics/internal/colors"
+	"gocv.io/x/gocv"
 )
 
-func Detect(filename string, template, img cv.Mat) {
+func Detect(filename string, template, img gocv.Mat) {
 	// Ищем лицо на изображении
-	result := cv.NewMat()
-	cv.MatchTemplate(img, template, &result, cv.TmSqdiffNormed, cv.NewMat())
+	result := gocv.NewMat()
+	gocv.MatchTemplate(img, template, &result, gocv.TmSqdiffNormed, gocv.NewMat())
 
-	_, _, topLeft, _ := cv.MinMaxLoc(result)
+	_, _, topLeft, _ := gocv.MinMaxLoc(result)
 
 	bottomRight := image.Point{X: topLeft.X + template.Cols(), Y: topLeft.Y + template.Rows()}
-	cv.Rectangle(&img, image.Rectangle{Min: topLeft, Max: bottomRight}, color.RGBA{A: 255, R: 255, G: 255, B: 255}, 1)
+	imgCopy := img.Clone()
+	gocv.Rectangle(&imgCopy, image.Rectangle{Min: topLeft, Max: bottomRight}, colors.Red, 1)
 
-	filename = "template_matching" + filename + "_output.jpg"
-	cv.IMWrite(filename, img)
+	filename = "template_matching/" + filename + "_output.jpg"
+	gocv.IMWrite(filename, imgCopy)
 }
