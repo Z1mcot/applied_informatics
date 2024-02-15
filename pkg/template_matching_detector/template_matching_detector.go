@@ -4,11 +4,12 @@ import (
 	"image"
 	_ "image/jpeg"
 
+	"github.com/z1mcot/applied_informatics/internal"
 	"github.com/z1mcot/applied_informatics/internal/colors"
 	"gocv.io/x/gocv"
 )
 
-func Detect(filename string, template, img gocv.Mat) {
+func Detect(filename string, template, img gocv.Mat) *internal.ImageForSave {
 	// Ищем лицо на изображении
 	result := gocv.NewMat()
 	gocv.MatchTemplate(img, template, &result, gocv.TmSqdiffNormed, gocv.NewMat())
@@ -20,5 +21,5 @@ func Detect(filename string, template, img gocv.Mat) {
 	gocv.Rectangle(&imgCopy, image.Rectangle{Min: topLeft, Max: bottomRight}, colors.Red, 1)
 
 	filename = "template_matching/" + filename + "_output.jpg"
-	gocv.IMWrite(filename, imgCopy)
+	return &internal.ImageForSave{Path: filename, Image: imgCopy}
 }

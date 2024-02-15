@@ -3,6 +3,7 @@ package vjdetector
 import (
 	"log"
 
+	"github.com/z1mcot/applied_informatics/internal"
 	"github.com/z1mcot/applied_informatics/internal/colors"
 	"gocv.io/x/gocv"
 )
@@ -11,23 +12,23 @@ type VJModel string
 
 const (
 	FrontFace VJModel = "../assets/haarcascades/haarcascade_frontalface_default.xml"
-	Eyes              = "../assets/haarcascades/haarcascade_eye_tree_eyeglasses.xml"
+	// Eyes              = "../assets/haarcascades/haarcascade_eye_tree_eyeglasses.xml"
 )
 
-func GetModels() [2]VJModel { return [2]VJModel{FrontFace, Eyes} }
+func GetModels() [1]VJModel { return [1]VJModel{FrontFace} }
 
 var modelNames = map[VJModel]string{
 	FrontFace: "front_face",
-	Eyes:      "eyes",
+	// Eyes:      "eyes",
 }
 
-func Detect(filename string, model VJModel, img gocv.Mat) {
+func Detect(filename string, model VJModel, img gocv.Mat) *internal.ImageForSave {
 	classifier := gocv.NewCascadeClassifier()
 	defer classifier.Close()
 
 	if !classifier.Load(string(model)) {
 		log.Fatal("Error reading cascade file: data/haarcascade_frontalface_default.xml")
-		return
+		return nil
 	}
 
 	imgCopy := img.Clone()
@@ -38,5 +39,6 @@ func Detect(filename string, model VJModel, img gocv.Mat) {
 	}
 
 	filename = "viola_jones/" + filename + "_" + modelNames[model] + ".jpg"
-	gocv.IMWrite(filename, imgCopy)
+
+	return &internal.ImageForSave{Path: filename, Image: imgCopy, DetectedAreas: detectedAreas}
 }

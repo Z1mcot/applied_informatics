@@ -1,5 +1,5 @@
 /.DS_Store
 
 # generated outputs
-/cmd/template_matching
-/cmd/viola_jones
+# /cmd/template_matching
+# /cmd/viola_jones
